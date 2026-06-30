@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Process — Walkthrough</title>
+<style>
+  :root{
+    --ink:#1f2937;--muted:#6b7280;--faint:#9ca3af;--line:#e5e7eb;--bg:#f4f6f5;--card:#fff;
+    --promoter:#e8862e;--promoter-s:#fdf0e1;
+    --ops:#1a8a3c;--ops-s:#e7f4ec;
+    --platform:#2f6fb0;--platform-s:#e8f0f9;
+    --farmer:#7c52c9;--farmer-s:#f0eafa;
+    --g:#43a047;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);font-size:14px;line-height:1.5;padding:26px 18px 70px;}
+  .wrap{max-width:920px;margin:0 auto;}
+  h1{font-size:22px;margin:0 0 4px;}
+  .sub{font-size:13px;color:var(--muted);margin:0 0 16px;}
+  .legend{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+  .lg{display:flex;align-items:center;gap:7px;font-size:12px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:5px 12px;}
+  .lg i{width:11px;height:11px;border-radius:50%;display:inline-block;}
+  .timing{font-size:12.5px;background:#fff8ec;border:1px solid #f0dcb4;border-radius:8px;padding:11px 14px;margin:8px 0 20px;}
+  .timing b{color:#8a5a08;}
+
+  .phase{display:flex;align-items:center;gap:10px;margin:24px 0 14px;}
+  .phase .tag{font-size:12px;font-weight:700;letter-spacing:.04em;color:#fff;border-radius:7px;padding:6px 14px;}
+  .phase .pre{background:#5b6f8a;}.phase .sea{background:#2e7d32;}
+  .phase .d{font-size:12px;color:var(--muted);}
+  .phase hr{flex:1;border:none;border-top:1px solid var(--line);}
+
+  .step{display:flex;gap:14px;margin-bottom:12px;align-items:stretch;}
+  .num{flex:0 0 34px;display:flex;flex-direction:column;align-items:center;}
+  .num .n{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;}
+  .num .line{flex:1;width:2px;background:var(--line);margin-top:4px;}
+  .step:last-child .num .line{display:none;}
+  .body{flex:1;background:var(--card);border:1px solid var(--line);border-left-width:4px;border-radius:10px;padding:12px 15px;cursor:pointer;transition:box-shadow .15s;}
+  .body:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
+  .tl{display:flex;align-items:center;gap:8px;}
+  .actor{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.03em;padding:2px 9px;border-radius:999px;}
+  .a-pro{background:var(--promoter-s);color:#9a5410;}.a-ops{background:var(--ops-s);color:#0f6e2e;}
+  .a-plat{background:var(--platform-s);color:#1f5286;}.a-far{background:var(--farmer-s);color:#5a36a0;}
+  .win{font-size:11px;font-weight:800;background:#fdeccb;border-radius:6px;padding:3px 9px;white-space:nowrap;}
+  .win.s{background:#dcefe0;}
+  .b-pro{border-left-color:var(--promoter);}.b-ops{border-left-color:var(--ops);}
+  .b-plat{border-left-color:var(--platform);}.b-far{border-left-color:var(--farmer);}
+  .act{font-size:14px;font-weight:600;margin:0 0 3px;}
+  .det{font-size:12.5px;color:var(--muted);margin:0;}
+  .viewlink{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--platform);margin-top:8px;}
+  .newtag{font-size:10px;font-weight:700;background:#ffe1e0;color:#c0322f;border-radius:5px;padding:2px 7px;margin-left:6px;}
+
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(20,28,24,.6);display:none;align-items:center;justify-content:center;padding:20px;z-index:60;}
+  .ov.show{display:flex;}
+  .modal{background:#fff;border-radius:16px;max-width:760px;width:100%;max-height:92vh;overflow:auto;display:flex;flex-direction:column;}
+  .m-h{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line);}
+  .ava{width:84px;height:84px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;flex-shrink:0;overflow:hidden;}
+  .ava svg{width:100%;height:100%;display:block;}
+  .cav{width:56px;height:56px;border-radius:50%;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;border:2px solid #fff;box-shadow:0 0 0 1px var(--line);}
+  .cav svg{width:100%;height:100%;display:block;}
+  .m-h .who{flex:1;}
+  .m-h .who .r{font-size:16px;font-weight:700;}
+  .m-h .who .s{font-size:12px;color:var(--muted);}
+  .m-h .x{border:none;background:none;font-size:20px;color:var(--muted);cursor:pointer;}
+  .m-b{display:flex;gap:18px;padding:20px;flex-wrap:wrap;}
+  .m-text{flex:1;min-width:220px;}
+  .m-text .stp{font-size:11px;font-weight:700;color:var(--faint);letter-spacing:.04em;}
+  .m-text h3{font-size:18px;margin:3px 0 8px;}
+  .m-text p{font-size:13.5px;color:#374151;margin:0 0 10px;}
+  .m-text .winbig{display:inline-block;font-size:12px;font-weight:800;background:#fdeccb;border-radius:6px;padding:4px 11px;}
+  .m-screen{flex:0 0 290px;display:flex;justify-content:center;}
+
+  /* mini phone mockups */
+  .mk{width:280px;border:1px solid #d7dade;border-radius:18px;overflow:hidden;background:#fff;box-shadow:0 8px 24px rgba(0,0,0,.12);font-size:12px;}
+  .mk-top{background:var(--g);color:#fff;padding:9px 12px;font-size:12px;display:flex;align-items:center;gap:6px;}
+  .mk-b{padding:12px;}
+  .stepper{display:flex;gap:4px;padding:9px 12px;border-bottom:1px solid var(--line);font-size:9.5px;color:var(--muted);}
+  .stepper b{color:var(--g);}
+  .fld{margin-bottom:10px;}
+  .fld label{font-size:9.5px;color:var(--muted);display:block;margin-bottom:3px;}
+  .inp{height:30px;border:1px solid var(--line);border-radius:7px;background:#fafbfc;display:flex;align-items:center;padding:0 9px;color:var(--faint);font-size:11px;}
+  .mk-btn{width:100%;background:var(--g);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-weight:600;margin-top:4px;}
+  .mk-btn.out{background:#fff;color:var(--g);border:1px solid #bfe0c2;}
+  .flag{background:#fdeaea;border-left:3px solid #d93838;border-radius:6px;padding:7px 9px;font-size:10.5px;color:#9a2420;margin-bottom:9px;}
+  .chip{font-size:9px;font-weight:700;padding:2px 8px;border-radius:999px;}
+  .c-await{background:#fbeccb;color:#9a6308;}.c-booked{background:#e7f4ec;color:#0f6e2e;}.c-open{background:#e9f0e9;color:#4b6b4d;}
+
+  /* bucket mini */
+  .bk{display:flex;align-items:center;gap:7px;margin:6px 0;font-size:10.5px;}
+  .bk .bar{flex:1;height:14px;border-radius:4px;display:flex;overflow:hidden;}
+  .bk .bar i{height:100%;}
+  .bk .v{width:30px;text-align:right;font-weight:700;}
+
+  /* whatsapp */
+  .wa{width:280px;border:1px solid #d7dade;border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.12);}
+  .wa-top{background:#075e54;color:#fff;padding:9px 12px;display:flex;align-items:center;gap:8px;font-size:12px;}
+  .wa-top .wav{width:26px;height:26px;border-radius:50%;background:#fff;color:#075e54;display:flex;align-items:center;justify-content:center;font-size:13px;}
+  .wa-b{background:#e5ddd5;background-image:radial-gradient(rgba(0,0,0,.03) 1px,transparent 0);background-size:14px 14px;padding:12px;min-height:230px;display:flex;flex-direction:column;gap:8px;}
+  .bub{max-width:82%;padding:7px 10px;border-radius:9px;font-size:11.5px;line-height:1.4;box-shadow:0 1px 1px rgba(0,0,0,.08);position:relative;}
+  .bub .t{font-size:8.5px;color:#667;text-align:right;margin-top:3px;}
+  .bub.in{background:#fff;align-self:flex-start;border-top-left-radius:2px;}
+  .bub.out{background:#d9fdd3;align-self:flex-end;border-top-right-radius:2px;}
+  .reply{display:flex;gap:6px;align-self:flex-end;margin-top:2px;}
+  .qr{background:#fff;border:1px solid #c9d6cf;color:#075e54;border-radius:14px;padding:5px 13px;font-size:11px;font-weight:600;}
+  .sys{background:#fafbfc;border:1px solid var(--line);border-radius:9px;padding:10px 11px;font-size:11px;margin-bottom:9px;}
+  .sys .r{display:flex;justify-content:space-between;margin:3px 0;}
+  .sys .r span{color:var(--muted);}
+  .arrowd{text-align:center;color:var(--faint);font-size:13px;margin:7px 0;}
+  .counter{background:#e7f4ec;border-radius:8px;padding:9px 11px;font-size:11px;color:#0f6e2e;font-weight:600;text-align:center;margin-top:9px;}
+  @media(max-width:640px){.m-screen{flex:1 1 100%;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Booking process — interactive walkthrough</h1>
+  <p class="sub">Tap any step to see who's acting and the screen they see. Steps 6–8 (the WhatsApp confirmation loop) are new mockups.</p>
+
+  <div class="legend">
+    <span class="lg"><i style="background:var(--promoter)"></i> Promoter (field · capture)</span>
+    <span class="lg"><i style="background:var(--ops)"></i> Rural Ops (owns target)</span>
+    <span class="lg"><i style="background:var(--platform)"></i> Platform</span>
+    <span class="lg"><i style="background:var(--farmer)"></i> Farmer (WhatsApp)</span>
+  </div>
+  <div class="timing">🗓️ <b>Timing:</b> Planning <b>and</b> booking happen in the ~90-day run-up <b>before</b> the season. Scheduling & dispatch happen <b>in</b> the season (~45 days).</div>
+
+  <div class="phase"><span class="tag pre">BEFORE THE SEASON · ~90 → 0 DAYS</span><span class="d">planning + booking run-up</span><hr></div>
+  <div id="phase1"></div>
+
+  <div class="phase"><span class="tag sea">IN THE SEASON · 0 → ~45 DAYS</span><span class="d">scheduling & dispatch</span><hr></div>
+  <div id="phase2"></div>
+</div>
+
+<div class="ov" id="ov" onclick="if(event.target===this)closeM()">
+  <div class="modal">
+    <div class="m-h"><div class="ava" id="mAva"></div><div class="who"><div class="r" id="mRole"></div><div class="s" id="mRoleSub"></div></div><button class="x" onclick="closeM()">✕</button></div>
+    <div class="m-b"><div class="m-text"><div class="stp" id="mStp"></div><h3 id="mTitle"></h3><span class="winbig" id="mWin"></span><div style="height:10px"></div><p id="mDesc"></p></div><div class="m-screen" id="mScreen"></div></div>
+  </div>
+</div>
+
+<script>
+  var ART={
+    pro:'<svg viewBox="0 0 64 64"><defs><clipPath id="pc1"><circle cx="32" cy="32" r="32"/></clipPath></defs><g clip-path="url(#pc1)"><rect width="64" height="64" fill="#fdf0e1"/><path d="M6 64 Q8 46 24 42 L40 42 Q56 46 58 64 Z" fill="#2a2f45"/><path d="M22 42 Q32 50 42 42 L44 51 Q32 59 20 51 Z" fill="#b8442f"/><path d="M30 40 L34 40 L33 51 L31 51 Z" fill="#9c3826"/><rect x="28" y="34" width="8" height="10" fill="#b07a4e"/><ellipse cx="32" cy="26" rx="11" ry="13" fill="#c68a5c"/><path d="M21 25 Q20 11 32 11 Q44 11 43 25 Q39 16 32 16 Q25 16 21 25 Z" fill="#241c1a"/><circle cx="27.5" cy="26" r="1.2" fill="#2a2018"/><circle cx="36.5" cy="26" r="1.2" fill="#2a2018"/></g></svg>',
+    ops:'<svg viewBox="0 0 64 64"><defs><clipPath id="pc2"><circle cx="32" cy="32" r="32"/></clipPath></defs><g clip-path="url(#pc2)"><rect width="64" height="64" fill="#e7f4ec"/><path d="M6 64 Q8 46 24 42 L40 42 Q56 46 58 64 Z" fill="#e0852a"/><path d="M24 42 L29 64 L33 64 L40 42 L36 42 L31 56 L28 42 Z" fill="#f4f4f2"/><rect x="28" y="34" width="8" height="10" fill="#b88150"/><ellipse cx="32" cy="26" rx="11" ry="13" fill="#c8915f"/><path d="M22 28 Q24 40 32 41 Q40 40 42 28 Q42 36 32 37 Q22 36 22 28 Z" fill="#241c1a"/><path d="M21 25 Q20 11 32 11 Q44 11 43 25 Q39 15 32 15 Q25 15 21 25 Z" fill="#241c1a"/><circle cx="27.5" cy="25.5" r="1.2" fill="#2a2018"/><circle cx="36.5" cy="25.5" r="1.2" fill="#2a2018"/></g></svg>',
+    far:'<svg viewBox="0 0 64 64"><defs><clipPath id="pc3"><circle cx="32" cy="32" r="32"/></clipPath></defs><g clip-path="url(#pc3)"><rect width="64" height="64" fill="#f0eafa"/><path d="M6 64 Q8 46 24 42 L40 42 Q56 46 58 64 Z" fill="#3f78b5"/><path d="M40 42 L53 46 L55 64 L43 64 Z" fill="#eef0ee"/><path d="M42 45 L51 48 M42 51 L52 54" stroke="#cfd6cf" stroke-width="1"/><rect x="28" y="34" width="8" height="10" fill="#9c6a40"/><ellipse cx="32" cy="26" rx="11" ry="13" fill="#aa7444"/><path d="M21 25 Q20 12 32 12 Q44 12 43 25 Q39 17 32 17 Q25 17 21 25 Z" fill="#2a2320"/><path d="M21 25 Q22 19 25 17 L25 23 Z" fill="#8a857f"/><path d="M26 31 Q32 34 38 31 Q34 33 32 33 Q30 33 26 31 Z" fill="#241c18"/><circle cx="27.5" cy="26" r="1.2" fill="#2a2018"/><circle cx="36.5" cy="26" r="1.2" fill="#2a2018"/></g></svg>',
+    plat:'🖥️'
+  };
+  var P={
+    pro:{role:'Promoter (Gramin Bandhu)',sub:'External · field agent · capture only',art:ART.pro,bg:'#fdf0e1'},
+    plat:{role:'Platform',sub:'BFC system · automated',art:ART.plat,bg:'#e8f0f9'},
+    ops:{role:'Rural Ops',sub:'1 per bank · owns the target',art:ART.ops,bg:'#e7f4ec'},
+    far:{role:'Farmer',sub:'via WhatsApp',art:ART.far,bg:'#f0eafa'},
+  };
+  function avatar(p,cls){var pr=P[p];return '<span class="'+cls+'" style="background:'+pr.bg+'">'+pr.art+'</span>';}
+
+  // mini-screen builders
+  function scOnboard(){return '<div class="mk"><div class="mk-top">＋ Add Agri-Partner</div><div class="stepper"><b>● Basic</b> · ○ Location · ○ Bank · ○ Docs</div><div class="mk-b"><div class="fld"><label>Farmer / Agri-Partner Name</label><div class="inp"></div></div><div class="fld"><label>Phone *</label><div class="inp"></div></div><div class="fld"><label>Interests *</label><div class="inp">Select…</div></div><button class="mk-btn">Save &amp; Next</button></div></div>';}
+  function scBucket(){return '<div class="mk"><div class="mk-top">🖥️ Auto-sort</div><div class="mk-b"><div class="sys"><div class="r"><b>Satti Babu</b><span>#227440</span></div><div class="r"><span>acreage</span>10 ac ✓</div><div class="r"><span>location</span>accurate ✓</div><div class="r"><span>bank</span><b style="color:#9a6308">missing ✗</b></div></div><div class="arrowd">↓ falls into one bucket</div><div class="bk"><span style="width:80px">Bank missing</span><div class="bar"><i style="width:100%;background:#dcb40a"></i></div></div><div style="font-size:9.5px;color:var(--faint);text-align:center;margin-top:6px">interest-only farmers = inflow, no bar</div></div></div>';}
+  function scDash(){return '<div class="mk"><div class="mk-top">📊 Rural Ops · readiness</div><div class="mk-b"><div style="font-size:10px;color:#a32d2d;font-weight:700">8% · 72 of 900 ac booked</div><div class="bar" style="height:8px;border-radius:5px;background:#fcebeb;margin:5px 0 10px"><i style="display:block;width:8%;height:100%;background:#e24b4a;border-radius:5px"></i></div><div class="bk"><span style="width:74px">Acreage</span><div class="bar"><i style="width:100%;background:#e0413c"></i></div><span class="v">320</span></div><div class="bk"><span style="width:74px">Location</span><div class="bar"><i style="width:56%;background:#ef8a2e"></i></div><span class="v">180</span></div><div class="bk"><span style="width:74px">Bank</span><div class="bar"><i style="width:9%;background:#dcb40a"></i></div><span class="v">28</span></div><div class="bk"><span style="width:74px">Qualified</span><div class="bar"><i style="width:57%;background:#1a8a3c"></i></div><span class="v">181</span></div></div></div>';}
+  function scComplete(){return '<div class="mk"><div class="mk-top">← Edit Location</div><div class="mk-b"><div class="flag">⚠ Location flagged: Invalid LULC: Builtup</div><div class="fld"><label>Acre</label><div class="inp">50.0</div></div><div class="fld"><label>Location Pin *</label><div class="inp" style="color:#2563eb">maps.app.goo.gl/xyz</div></div><button class="mk-btn out">◎ Use Current Location</button><div style="height:7px"></div><button class="mk-btn">Continue</button></div></div>';}
+  function scBook(){return '<div class="mk"><div class="mk-top">📋 Book — confirmed supply</div><div class="mk-b"><div class="flag">ⓘ Real commitment. On confirm, farmer gets a WhatsApp &amp; this counts to target.</div><div class="fld"><label>Plan</label><div class="inp">Plan 209 — Maize 2026</div></div><div class="fld"><label>Acreage to book</label><div class="inp">10</div></div><div class="fld"><label>Expected date</label><div class="inp">DD/MM/YYYY</div></div><button class="mk-btn">Book &amp; notify farmer</button></div></div>';}
+  function scAwait(){return '<div class="mk"><div class="mk-top">🖥️ Booking created</div><div class="mk-b"><div class="sys"><div class="r"><b>Booking</b><span class="chip c-await">AWAITING</span></div><div class="r"><span>Satti Babu</span>10 ac · Maize</div><div class="r"><span>counts to target?</span><b style="color:#9a6308">not yet</b></div></div><div class="arrowd">↓ sends WhatsApp</div><div class="wa" style="width:auto"><div class="wa-top"><span class="wav">B</span> BioFuel Circle</div><div class="wa-b" style="min-height:90px"><div class="bub out">नमस्ते Satti Babu 🙏<br>Booking: <b>10 acre maize</b>, ~12 Nov. Reply <b>हाँ</b> to confirm.<div class="t">11:04 ✓✓</div></div></div></div></div></div>';}
+  function scFarmerReply(){return '<div class="wa"><div class="wa-top"><span class="wav">B</span> BioFuel Circle</div><div class="wa-b"><div class="bub in">नमस्ते Satti Babu 🙏<br>Booking: <b>10 acre maize</b>, ~12 Nov.<br>Confirm karein?<div class="t">11:04</div></div><div class="reply"><span class="qr">हाँ ✅</span><span class="qr">नहीं</span></div><div class="bub out">हाँ<div class="t">11:21 ✓✓</div></div><div class="bub in">धन्यवाद! Booking confirm ✅<br>Aggregation team aapse jaldi sampark karegi.<div class="t">11:21</div></div></div></div>';}
+  function scConfirmed(){return '<div class="mk"><div class="mk-top">🖥️ Confirmed</div><div class="mk-b"><div class="sys"><div class="r"><b>Booking</b><span class="chip c-booked">BOOKED ✓</span></div><div class="r"><span>confirmed by</span>farmer (WhatsApp)</div><div class="r"><span>11:21 · audit ✓</span>geo-stamped</div></div><div class="bk" style="margin-top:10px"><span style="width:74px">Qualified</span><div class="bar"><i style="width:62%;background:#1a8a3c"></i><i style="width:38%;background:#1a8a3c;opacity:.3"></i></div></div><div style="font-size:9px;color:var(--faint);text-align:right">solid grew → +10 ac booked</div><div class="counter">+10 ac → Plan 209 target 82 → 92 ac</div></div></div>';}
+  function scSchedule(){return '<div class="mk"><div class="mk-top">📅 Slashing — Schedule</div><div class="mk-b"><div class="fld"><label>Plan</label><div class="inp">208 — Rice Straw</div></div><div class="fld"><label>Status</label><div class="inp">Confirmed</div></div><div class="fld"><label>Schedule date</label><div class="inp">12/11/2026</div></div><div class="fld"><label>Acreage</label><div class="inp">10</div></div><button class="mk-btn">Save</button></div></div>';}
+
+  var STEPS=[
+    {n:1,p:'pro',win:'90–60 days before',phase:1,act:'Visit the farmer on-site & onboard via the app',det:'Captures name, mobile, location (pin + live geo-photo), crop, harvest date, bank (optional), interest(s). This is the promoter\'s whole job — capture, not sell.',sc:scOnboard},
+    {n:2,p:'plat',win:'90–60 days before',phase:1,act:'Sort each farmer into one actionable bucket',det:'Acreage missing → Location flagged → Bank missing → Qualified. Each farmer in exactly one. Bulk "interest only" stays as inflow, not a bar.',sc:scBucket},
+    {n:3,p:'ops',win:'60–30 days before',phase:1,act:'Set the season target & prioritise villages',det:'Reads the readiness dashboard; directs promoters — closest + high-potential villages + returning farmers first.',sc:scDash},
+    {n:4,p:'pro',win:'60–30 days before',phase:1,act:'Complete the data gaps for assigned farmers',det:'Adds acreage, fixes flagged locations, collects bank where possible — moving farmers toward Qualified.',sc:scComplete},
+    {n:5,p:'pro',win:'30–7 days before',phase:1,act:'Farmer agrees → initiate "Book Now"',det:'Captures plan + acreage + expected date. No target shown to the promoter — it stays onboarding, not selling.',sc:scBook},
+    {n:6,p:'plat',win:'30–7 days before',phase:1,act:'Create "Awaiting confirmation" & message the farmer',det:'Booking is created but DOES NOT count yet (faded bar). Platform sends a WhatsApp asking the farmer to confirm.',sc:scAwait,isNew:true},
+    {n:7,p:'far',win:'7–0 days before',phase:1,act:'Farmer confirms on WhatsApp',det:'A one-tap "हाँ" reply (or a field-visit confirmation). The farmer\'s yes — not the promoter\'s persuasion — is what validates the booking.',sc:scFarmerReply,isNew:true},
+    {n:8,p:'plat',win:'7–0 days before',phase:1,act:'Mark Confirmed → now it counts',det:'Booking turns solid, adds to booked-vs-target with an audit stamp. By season start, a confirmed book of supply exists. Unconfirmed ones flag as fall-off.',sc:scConfirmed,isNew:true},
+    {n:9,p:'ops',win:'0–7 days of season',phase:2,act:'Schedule the equipment against confirmed bookings',det:'Pins precise dates and dispatches equipment sets (raker + baler + harvester + trolley). Scheduling lives here — in-season.',sc:scSchedule},
+    {n:10,p:'ops',win:'7–30 days of season',phase:2,act:'Aggregate & receive at the Biomass Bank',det:'Equipment runs, biomass collected, weighbridge receipt logged; Rural Ops keeps chasing fall-offs.',sc:null},
+    {n:11,p:'ops',win:'30–45 days of season',phase:2,act:'Final pickups, close-out & payout',det:'Last harvests collected; pending bank details collected at payout (never a booking gate); season closes vs target.',sc:null},
+  ];
+
+  function actorTag(p){var m={pro:['a-pro','● PROMOTER'],plat:['a-plat','● PLATFORM'],ops:['a-ops','● RURAL OPS'],far:['a-far','● FARMER']};return '<span class="actor '+m[p][0]+'">'+m[p][1]+'</span>';}
+  function render(){
+    var h1='',h2='';
+    STEPS.forEach(function(s){
+      var bcls={pro:'b-pro',plat:'b-plat',ops:'b-ops',far:'b-far'}[s.p];
+      var wcls=s.phase===2?'win s':'win';
+      var view=s.sc?'<div class="viewlink">📱 View screen →</div>':'<div class="viewlink" style="color:var(--faint)">execution step</div>';
+      var nt=s.isNew?'<span class="newtag">NEW MOCKUP</span>':'';
+      var html='<div class="step"><div class="num"><div class="n">'+s.n+'</div><div class="line"></div></div>'+
+        '<div class="body '+bcls+'" onclick="openM('+s.n+')"><div class="top"><div class="tl">'+avatar(s.p,'cav')+actorTag(s.p)+'</div><span class="'+wcls+'">'+s.win+'</span></div>'+
+        '<p class="act">'+s.act+nt+'</p><p class="det">'+s.det+'</p>'+view+'</div></div>';
+      if(s.phase===1)h1+=html;else h2+=html;
+    });
+    document.getElementById('phase1').innerHTML=h1;
+    document.getElementById('phase2').innerHTML=h2;
+  }
+  function openM(n){
+    var s=STEPS.find(x=>x.n===n);if(!s||!s.sc)return;
+    var pr=P[s.p];
+    document.getElementById('mAva').innerHTML=pr.art;
+    document.getElementById('mAva').style.background=pr.bg;
+    document.getElementById('mRole').textContent=pr.role;
+    document.getElementById('mRoleSub').textContent=pr.sub;
+    document.getElementById('mStp').textContent='STEP '+s.n;
+    document.getElementById('mTitle').textContent=s.act;
+    document.getElementById('mWin').textContent='🗓️ '+s.win+(s.phase===2?' season':' season');
+    document.getElementById('mDesc').textContent=s.det;
+    document.getElementById('mScreen').innerHTML=s.sc();
+    document.getElementById('ov').classList.add('show');
+  }
+  function closeM(){document.getElementById('ov').classList.remove('show');}
+  render();
+</script>
+</body>
+</html>
